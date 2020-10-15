@@ -1,0 +1,7 @@
+setuptools
+pandas
+sty
+datetime
+dateutil
+difflib
+pickle
