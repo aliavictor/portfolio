@@ -1,7 +1,11 @@
-# Miscellaneous Scripts
+# Alia's Toolbox
 
-This is a collection of various scripts that tackle specific obstacles I've encountered over the last couple years. Unlike the [facebook_tools](https://github.com/aliavictor/portfolio/tree/main/facebook_tools) and [google_tools](https://github.com/aliavictor/portfolio/tree/main/google_tools) packages, these aren't meant to be deployed on other systems but rather provide insights into how I code/solve problems. Below is a breakdown of each script and what particular problem it was created to solve.
+This is a collection of various little helper tools I've built over the years. They're not particularly fancy, it just allows you to use less code so things are more concise and easier to read. For example, reset(df) is the equivalent of df.reset_index(drop=True). The former artist in me loves colors, so on top of building functional helper functions there are also various aesthetic helper functions as well. 
 ***
-## update_payment.py
+### helpers.py
 
-I was tasked with updating the primary payment method on roughly 9,000 Facebook ad accounts. Unfortunately there's no way to do this through the API, you <i>have</i> to manually do this directly in the Ads Manager UI. Considering how wasteful it would be to spend so much time on such a tedious task, I turned to Selenium and wrote this script to solve this issue.
+These consist of the practical/functional helper tools. These encompass pretty much everything; dataframes, calculations, text, etc.
+
+### colors.py
+
+These are purely for aesthetic purposes, mostly consisting of functions that print in a particular color. Printing certain information in particular colors (i.e. printing errors/warnings in red) is helpful on its own, but these functions take it a step further and allow you to use (basic) HTML text formatting for further visual cues. For example, `red('This is a big error!',False)` would print 'This is a big error!' in red text. Similarly `red('This is a <b>big</b> error!',False)` would print 'This is a <b>big</b> error!' in red text as well, but with big bolded this time.
