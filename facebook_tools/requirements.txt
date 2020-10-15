@@ -1,0 +1,8 @@
+setuptools
+pandas
+requests
+asyncio
+nest_asyncio
+aiohttp
+functools
+datetime
