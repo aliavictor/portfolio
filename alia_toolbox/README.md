@@ -1,6 +1,6 @@
 # Alia's Toolbox
 
-This is a collection of various little helper tools I've built over the years. They're not particularly fancy, it just allows you to use less code so things are more concise and easier to read. For example, reset(df) is the equivalent of df.reset_index(drop=True). The former artist in me loves colors, so on top of building functional helper functions there are also various aesthetic helper functions as well. 
+This is a collection of various little helper tools I've built over the years. They're not particularly fancy, it just allows you to use less code so things are more concise and easier to read. For example, `reset(df)` is the equivalent of `df.reset_index(drop=True)`. The former artist in me loves colors, so on top of building functional helper functions there are also various aesthetic helper functions as well. 
 ***
 ### helpers.py
 
