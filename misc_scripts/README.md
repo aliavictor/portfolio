@@ -1,6 +1,6 @@
 # Miscellaneous Scripts
 
-This is a collection of various scripts that tackle specific obstacles I've encountered over the last couple years. Unlike the [facebook_tools](https://github.com/aliavictor/portfolio/tree/main/facebook_tools) and [google_tools](https://github.com/aliavictor/portfolio/tree/main/google_tools) packages, these aren't meant to be deployed on other systems but rather act as dummy scripts provide insight into how I code/solve problems. Below is a breakdown of each script and what particular problem it was created to solve.
+This is a collection of various scripts that tackle specific obstacles I've encountered over the last couple years. Unlike the [facebook_tools](https://github.com/aliavictor/portfolio/tree/main/facebook_tools) and [google_tools](https://github.com/aliavictor/portfolio/tree/main/google_tools) packages, these aren't meant to be deployed on other systems but rather act as dummy scripts to provide insight into how I code/solve problems. Below is a breakdown of each script and what particular problem it was created to solve.
 ***
 ## update_payment.py
 
