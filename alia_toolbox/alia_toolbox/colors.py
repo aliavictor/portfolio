@@ -5,7 +5,8 @@ import re
 def color_opts(x=None):
     """
     When nothing is passed entire list of sty's color options with their corresponding numbers are returned.
-    Alternatively you can pass a specific number to see what color it corresponds to in sty."""
+    Alternatively you can pass a specific number to see what color it corresponds to in sty.
+    """
     if x is None:
         for i in range(256):
             print(fg(i)+'fg({0})'.format(i)+rs.all)
@@ -300,7 +301,8 @@ def pcolor(x,cid,ts=True,r=False):
 def pprint(x,ts=True,r=False):
     """
     Identical to other color functions, except you have more control over the string color(s).
-    Example: '<33>Hello world!</33>' would print the string 'Hello world!' in the corresponding sty color value (blue)"""
+    Example: '<33>Hello world!</33>' would print the string 'Hello world!' in the corresponding sty color value (blue)
+    """
     color_rgx1 = re.compile('<([\d{,2}]*)>')
     color_rgx2 = re.compile('<\/([\d{,2]*)>')
     bold_rgx = re.compile('(<b>)',re.IGNORECASE)
