@@ -1,16 +1,18 @@
+#!/usr/bin/env python3
+# refer to the README for information about this script
+
+# import appropriate modules
 from google_tools import GSheets
 from alia_toolbox.helpers import *
 from alia_toolbox.colors import *
 import selenium
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import (TimeoutException, NoSuchElementException, WebDriverException, StaleElementReferenceException, NoSuchWindowException)
 from selenium.webdriver.common.action_chains import ActionChains
 
-# custom helper formulas
+# custom helper functions
 def fb_refresh(fb,df,cols,key='adset_id'):
     """
     fb: should be an instance of the FACEBOOK class from the facebook_tools package
@@ -120,12 +122,65 @@ def start_chrome(headless=False):
     driver.implicitly_wait(1)
 
     return driver, wait
+def looper(df,driver,wait):
+    """
+    This is where the bulk of the heavy lifting is done. Each row in your df should have a link to update the
+    payment method for that particular account. The df is then looped over and the Selenium browser is directed
+    to each account's payment link and goes through the apporpriate motions in the UI. Ads Manager can be slow
+    and buggy, so it's not uncommon for the page to stall and the updated payment method isn't actually applied
+    to the account. The df is looped over up to 3 times to catch any of these stragglers.
+    """
+    y = 0
+    while y < 3 and (df['done']!='Y').any():
+        y += 1
+        # filter out items that are either done or have 3+ failed attempts (not worth trying these again)
+        todo = (df['done']!='Y')&(df['attempts']<3)
+        z = 0
+        for row in df.loc[todo].itertuples():
+            z += 1
+            df.loc[row.Index,'attempts'] += 1
+            try:
+                # wait for account's payment page to load, then click "Add Payment Method"
+                driver.get(row.link)
+                WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,add_payment)))
+                driver.find_element_by_xpath(add_payment).click()
+
+                # wait for next window to load, then click "Business Manager Payment Method" and then "Continue"
+                WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,payment_window)))
+                WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,payment_from_bm)))
+                WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,payment_from_bm)))
+                driver.find_element_by_xpath(payment_from_bm).click()
+                WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,cont_button)))
+                driver.find_element_by_css_selector(cont_button).click()
+
+                # wait for next window to load, then find the target card and click it
+                WebDriverWait(driver,15).until(EC.visibility_of_element_located((By.XPATH,card_window)))
+                wait.until(EC.element_to_be_clickable((By.XPATH,card_xpath)))
+                driver.find_element_by_xpath(card_xpath).click()
+                wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR,cont_button2)))
+                driver.find_element_by_css_selector(cont_button2).click()
+
+                # wait for confirmation that the change was successfully applied
+                WebDriverWait(driver,30).until(EC.visibility_of_element_located((By.XPATH,success)))
+                df.loc[row.Index,'done'] = 'Y'
+                teal(f'{z}/{to_go} <b>act_{row.account_id}</b>')
+            except:
+                err = show_error()
+                errors.append({'account_id':row.account_id,'error':err})
+                df.loc[row.Index,'done'] = 'ERROR'
+                red('<b>ERROR</b>')
+    if (df['done']!='Y').any():
+        num_failed = len(df.query("done != 'Y'"))
+        red(f'{num_failed} accounts failed')
 
 target_card = 'Visa *1234'
-# template url for accessing the payment page of an ad account
+# template url for accessing the payment page of an ad account in Ads Manager
 url = 'https://business.facebook.com/ads/manager/account_settings/account_billing/?act={0}&pid=p1&business_id=your_business_id&page=account_settings&tab=account_billing_settings'
+# decide the filename and destination path for saving your results
+fname = 'updated_accounts_{0}'.format(now('%m-%d-%y')) # or whatever you'd like
+fpath = 'your_desired_path'
 
-# xpath/css to what needs to be clicked/waiting for
+# xpath/css to what needs to be clicked/waited for
 add_payment = '//*[contains(text(),"Add Payment Method")]'
 payment_window = '//*[contains(text(),"Add Payment Information")]'
 payment_from_bm = '//*[contains(text(),"Business Manager Payment Method")]'
@@ -135,9 +190,12 @@ card_xpath = '//*[contains(text(),"{0}")]'.format(target_card)
 cont_button2 = 'div[aria-label="Confirm"]'
 success = '//*[contains(text(),"{0} is now the primary payment")]'.format(target_card)
 
-gs = GSheets(outh_file='path-to-outh_file')
+# prepare account data
+gs = GSheets(outh_file='path_to_outh_file')
 # create master df by reading Google Sheet with ad account table
+# (columns consist of account_id & account_name)
 dfm = gs.read('Ad Account Database','Active','A1','B')
+# make a column containing each account's specific Ads Manager url
 dfm['link'] = dfm['account_id'].apply(lambda x: url.format(x))
 # add placeholder columns
 dfm['done'] = None
@@ -145,6 +203,7 @@ dfm['attempts'] = 0
 dfm['account_status'] = None
 dfm['card'] = None
 # use fb_refresh to pull realtime account statuses and current cards
+# (statuses in particular can change at any moment, so always a good idea to refresh)
 dfm = fb_refresh(dfm,['card','account_status'],key='account_id')
 # filter out accounts that are disabled or already have the target card
 mask = (dfm['account_status']==1)&(dfm['card']!=target_card.upper())
@@ -153,51 +212,8 @@ df = reset(dfm.loc[mask])
 # initialize Chrome webdriver
 driver, wait = start_chrome()
 
-# time to loop through the df!
-# it's a good idea to loop through a few times to catch anything that stalled/failed
-y = 0
-while y < 3 and (df['done']!='Y').any():
-    y += 1
-    # filter out items that are either done or have 3+ failed attempts (not worth trying these again)
-    todo = (df['done']!='Y')&(df['attempts']<3)
-    z = 0
-    for row in df.loc[todo].itertuples():
-        z += 1
-        df.loc[row.Index,'attempts'] += 1
-        try:
-            # wait for account's payment page to load, then click "Add Payment Method"
-            driver.get(row.link)
-            WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,add_payment)))
-            driver.find_element_by_xpath(add_payment).click()
+# time to loop through the df and update the accounts!
+looper(df,driver,wait)
 
-            # wait for next window to load, then click "Business Manager Payment Method" and then "Continue"
-            WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,payment_window)))
-            WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,payment_from_bm)))
-            WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.XPATH,payment_from_bm)))
-            driver.find_element_by_xpath(payment_from_bm).click()
-            WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.CSS_SELECTOR,cont_button)))
-            driver.find_element_by_css_selector(cont_button).click()
-
-            # wait for next window to load, then find the target card and click it
-            WebDriverWait(driver,15).until(EC.visibility_of_element_located((By.XPATH,card_window)))
-            wait.until(EC.element_to_be_clickable((By.XPATH,card_xpath)))
-            driver.find_element_by_xpath(card_xpath).click()
-            wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR,cont_button2)))
-            driver.find_element_by_css_selector(cont_button2).click()
-
-            # wait for confirmation that the change was successfully applied
-            WebDriverWait(driver,30).until(EC.visibility_of_element_located((By.XPATH,success)))
-            df.loc[row.Index,'done'] = 'Y'
-            teal(f'{z}/{to_go} <b>act_{row.account_id}</b>')
-        except:
-            err = show_error()
-            errors.append({'account_id':row.account_id,'error':err})
-            df.loc[row.Index,'done'] = 'ERROR'
-            red('<b>ERROR</b>')
-
-if (df['done']!='Y').any():
-    num_failed = len(df.query("done != 'Y'"))
-    red(f'{num_failed} accounts failed')
 # save df + errors in a pickle file
-fname = 'updated_accounts_{0}'.format(now('%m-%d-%y'))
-save_pkl({'df':df,'errors':errors},fname,path='/desired-path/')
+save_pkl({'df':df,'errors':errors},fname,path=fpath)
