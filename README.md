@@ -6,7 +6,7 @@ This is a collection of various Python tools/scripts I've built recently (which 
 
 Variety of small helper functions. Right now there are 2 categories:
 - <b>Helpers [[x](https://github.com/aliavictor/portfolio/blob/main/alia_toolbox/alia_toolbox/helpers.py)]:</b> Practical/functional tools that span a range of uses, from calculations to file manipulation
-- <b>Colors [[x](https://github.com/aliavictor/portfolio/blob/main/alia_toolbox/alia_toolbox/colors.py)]:</b> Aesthetic tools that gives the user stylistic control over printed outputs
+- <b>Colors [[x](https://github.com/aliavictor/portfolio/blob/main/alia_toolbox/alia_toolbox/colors.py)]:</b> Aesthetic tools that give the user stylistic control over printed outputs
 
 ### facebook_tools
 
