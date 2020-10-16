@@ -9,7 +9,10 @@ class FACEBOOK(object):
         self.api_v = api_version
         self.errors = []
     def read(self,obj_id,edge=None,fields=None,only_url=False,**params):
-        """Reads an FB object (if the object is an ad account you must include act_ prefix). Params could be breakdowns='device_platform', etc. When only_url=True the compiled graph API url is returned."""
+        """
+        Reads an FB object (if the object is an ad account you must include act_ prefix). Params could be
+        breakdowns='device_platform', etc. When only_url=True the compiled graph API url is returned.
+        """
         if edge is None:
             base = f'https://graph.facebook.com/{self.api_v}/{obj_id}/?'
         else:
@@ -36,6 +39,10 @@ class FACEBOOK(object):
         else:
             return self.read_url
     def bulk_read(self,ids,edge=None,fields=None,**params):
+        """
+        Essentially identical to the read function, but instead of a single request this performs
+        multiple requests asynchronously. The ids parameter should be a list of marketing object IDs.
+        """
         async def fetch_all(urls):
             tasks = []
             async with aiohttp.ClientSession(loop=self.loop) as session:
