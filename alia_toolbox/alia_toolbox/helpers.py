@@ -90,7 +90,7 @@ def find_common(t1,t2,keep_order=True):
         t2 = list(t2.columns)
     items = set(t1)&set(t2)
     if keep_order:
-        return sorted(items,key=lambda x:t1.index(x)) # ← was t1.index(x)+t2.index(x)
+        return sorted(items,key=lambda x:t1.index(x))
     else:
         return list(items)
 
@@ -125,15 +125,10 @@ def contains(items,to_check,exact=True,_all=True):
             items = [i.strip() for i in items.split(',')]
         else:
             items = [items]
-    dd = []
     if exact:
-        for i in items:
-            if i in to_check:
-                dd.append(i)
+        dd = [i for i in items if i in to_check]
     else:
-        for i in items:
-            if str(i).lower().strip() in to_check:
-                dd.append(i)
+        dd = [i for i in items if str(i).lower().strip() in to_check]
     if len(dd) == 0:
         pink("None of the passed items were found in the given list",ts=False)
     else:
