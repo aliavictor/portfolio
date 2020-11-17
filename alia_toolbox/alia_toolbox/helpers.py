@@ -402,12 +402,14 @@ def reset(df):
     "Simply returns df.reset_index(drop=True)"
     return df.reset_index(drop=True)
 
-def dtcol(series,style=None):
-    """Returns formatted datetime column in the format passed in the style parameter."""
+def dtcol(dt_column,style=None):
+    """
+    Returns a formatted datetime column in the format passed in the style parameter.
+    """
     if style:
-        return pd.to_datetime(pd.to_datetime(series.astype(str)).dt.strftime(style))
+        return pd.to_datetime(pd.to_datetime(dt_column.astype(str)).dt.strftime(style))
     else:
-        return pd.to_datetime(series.astype(str))
+        return pd.to_datetime(dt_column.astype(str))
 
 def select_dtcols(df):
     """Returns all columns with datetime64 dtype (df.select_dtypes(include=['datetime64']))."""
