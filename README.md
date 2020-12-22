@@ -8,6 +8,10 @@ Variety of small helper functions. Right now there are 2 categories:
 - <b>Helpers [[x](https://github.com/aliavictor/portfolio/blob/main/alia_toolbox/alia_toolbox/helpers.py)]:</b> Practical/functional tools that span a range of uses, from calculations to file manipulation
 - <b>Colors [[x](https://github.com/aliavictor/portfolio/blob/main/alia_toolbox/alia_toolbox/colors.py)]:</b> Aesthetic tools that give the user stylistic control over printed outputs
 
+### bleach_search
+
+WIP project for fans of the Bleach manga/anime. Right now the only functionality is passing a certain character and returning a summary of all the episodes that character appears in. Details about additional features in the pipeline are summarized in the [README](https://github.com/aliavictor/portfolio/blob/main/bleach_search/README.md).
+
 ### facebook_tools
 
 Tools built on Facebook's marketing API for the management of ad campaigns. Currently only supports `GET` requests (both single/synchronous and bulk/asynchronous), but much more functionality is on the way.
