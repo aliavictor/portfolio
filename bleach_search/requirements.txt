@@ -1,0 +1,6 @@
+setuptools
+pandas
+requests
+sqlalchemy
+difflib
+bs4
