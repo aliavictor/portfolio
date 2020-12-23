@@ -88,4 +88,32 @@ class Bleach(object):
         if sort:
             self.episodes = self.episodes.sort_values('mentions',ascending=False).reset_index(drop=True)
         return self.episodes
+    def find_chapters(self,character,sort=False):
+        if not hasattr(self,'character'):
+            chr_check = self.parse_character(character)
+            if chr_check is None:
+                red(f"<b>Can't find {character}</b>",False)
+                return None
+            else:
+                self.character = chr_check
+        if not hasattr(self,'character2'):
+            self.character2 = ' '.join(self.character.split(" ")[::-1])
 
+        mask = self.chpdata['characters'].apply(
+            lambda x: any(i in x.split('\n') for i in [self.character,self.character2]))
+        self.chapters = self.chpdata.loc[mask].reset_index(drop=True)
+        self.chapters['mentions'] = 0
+        self.chapters['relevant'] = 0
+
+        cc = [c for c in [self.character,self.character2]+self.character.split()]
+        cc = sorted(cc+[f"{i}'s" for i in cc],key=len,reverse=True)
+        for row in self.chapters.itertuples():
+            mentions = []
+            for c in cc:
+                mentions.append(row.summary.lower().count(c.lower()))
+            self.chapters.loc[row.Index,'mentions'] = sum(mentions)
+            relevant = [t for t in row.summary.split('\n') if any(f in t.lower() for f in self.character.lower().split(' '))]
+            self.chapters.loc[row.Index,'relevant'] = '\n'.join(relevant)
+        if sort:
+            self.chapters = self.chapters.sort_values('mentions',ascending=False).reset_index(drop=True)
+        return self.chapters
