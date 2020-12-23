@@ -10,7 +10,7 @@ Variety of small helper functions. Right now there are 2 categories:
 
 ### bleach_search
 
-WIP project for fans of the Bleach manga/anime. Right now the only functionality is passing a certain character and returning a summary of all the episodes that character appears in. Details about additional features in the pipeline are summarized in the [README](https://github.com/aliavictor/portfolio/blob/main/bleach_search/README.md).
+WIP project for fans of the Bleach manga/anime. Right now the only functionality is passing a certain character and returning a summary of all the episodes/chapters that character appears in. Details about additional features in the pipeline are summarized in the [README](https://github.com/aliavictor/portfolio/blob/main/bleach_search/README.md).
 
 ### facebook_tools
 
