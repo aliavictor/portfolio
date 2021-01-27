@@ -255,6 +255,13 @@ def uinput(msg,**kwargs):
         raw_input = str(input(pprint(msg,ts=False,r=True)))
         return raw_input
 
+def strip_currency(x,vtype=float):
+    """Removes all non-digit/decimal values (effectively strips all currency symbols)"""
+    try:
+        return vtype(re.compile(r'[^\d.,-]+').sub('',x.replace(',','')))
+    except:
+        return None
+
 def match(rinput,opts,hush=True):
     """Returns difflib.get_close_matches(rinput,opts). rinput should be a string and opts should be a list."""
     if type(opts) == str:
