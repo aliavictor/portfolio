@@ -339,7 +339,7 @@ def save_pkl(obj_to_save,filename,path,overwrite=False):
     This is helpful in cases where a file with the desired filename already exists and gets automatically adjusted
     (i.e. if file.pkl already exists and overwrite=False this file would end up being named file (1).pkl)
 
-    PARAMETERS
+    ::PARAMETERS::
     obj_to_save: Any pickelable object you want to save
     filename: Desired filename (no need to include extension)
     path: The (full) path where you want the file saved
@@ -372,7 +372,7 @@ def save_json(obj_to_save,filename,path='desktop',overwrite=False):
     This is helpful in cases where a file with the desired filename already exists and gets automatically adjusted
     (i.e. if file.json already exists and overwrite=False this file would end up being named file (1).json)
 
-    PARAMETERS
+    ::PARAMETERS::
     obj_to_save: Any JSON object you want to save
     filename: Desired filename (no need to include extension)
     path: The (full) path where you want the file saved
@@ -398,6 +398,23 @@ def save_json(obj_to_save,filename,path='desktop',overwrite=False):
         err = errname()
         red(f'<b>{err}</b>',False)
         return None
+
+def filelist(dirpath,prefix=None):
+    """
+    Returns a list of files in the given directory path. You can optionally pass a file prefix
+    to only pull files that start with the given prefix.
+
+    ::PARAMETERS::
+    dirpath: Path to the folder containing the target files
+    prefix: Only pulls files that start with this given prefix
+    """
+    try:
+        files = [i for i in os.listdir(dirpath) if i[0].isalnum()]
+    except FileNotFoundError:
+            red("<b>Can't locate files in given directory</b>")
+            return None
+    if prefix:
+        return [i for i in files if prefix in i]
 
 # DATAFRAME FUNCTIONS
 
