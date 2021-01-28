@@ -9,6 +9,7 @@ import re
 import json
 import pandas as pd
 import os
+import pyperclip
 
 # MISC FUNCTIONS
 
@@ -331,6 +332,13 @@ def empty(obj):
         return bool(obj == '')
     elif type(obj) == dict:
         return bool(len(keys(obj))==0)
+
+def clipboard(x):
+    """
+    Copies text to clipboard so it can be pasted anywhere.
+    """
+    pyperclip.copy(x)
+    green('Copied to clipboard',ts=False)
 
 # FILE PARSING FUNCTIONS
 
