@@ -416,6 +416,8 @@ def filelist(dirpath,prefix=None):
             return None
     if prefix:
         return [i for i in files if prefix in i]
+    else:
+        return files
 
 # DATAFRAME FUNCTIONS
 
