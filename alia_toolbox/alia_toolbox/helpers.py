@@ -342,6 +342,28 @@ def clipboard(x):
 
 # FILE PARSING FUNCTIONS
 
+def from_excel(filename,sheet_name=None,reformat=True):
+    """
+    Opens an Excel file and returns a dataframe.
+
+    ::PARAMETERS::
+    filename: Name of the file to open
+    sheet_name: The name of the Excel sheet within the file to open (default is 'Sheet1')
+    reformat: When True, all column names become lowercase and spaces are replaced with underscores
+    """
+    filename = filename.replace('.xlsx','').strip()
+    if sheet_name is None:
+        sheet = 'Sheet1'
+    elif sheet_name == '':
+        sheet = 'Sheet1'
+    else:
+        sheet = sheet_name
+    df = pd.read_excel(
+        f'{filename}.xlsx',sheet_name=sheet,index_col=None)
+    if reformat:
+        df.columns = df.columns.str.replace(' ','_').str.replace("'",'').str.lower()
+    return set_none(df)
+
 def save_pkl(obj_to_save,filename,path,overwrite=False):
     """
     Saves object as a pickle file. SP (SavePkl class) is global, so you can later reference the final filename.
@@ -432,6 +454,10 @@ def filelist(dirpath,prefix=None):
 def reset(df):
     "Simply returns df.reset_index(drop=True)"
     return df.reset_index(drop=True)
+
+def set_none(df):
+    "Returns df.where(~pd.isnull(df),None)"
+    return df.where(~pd.isnull(df),None)
 
 def dtcol(dt_column,style=None):
     """
