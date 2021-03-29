@@ -2,6 +2,7 @@ from alia_toolbox.colors import *
 from contextlib import redirect_stdout, contextmanager
 from datetime import datetime, timedelta, date
 from dateutil.parser import parse
+from sqlalchemy import create_engine
 import difflib
 import traceback
 import pickle
@@ -339,6 +340,24 @@ def clipboard(x):
     """
     pyperclip.copy(x)
     green('Copied to clipboard',ts=False)
+
+def psquery(q,host,user,pw,db,port=8338):
+    """
+    Pass in a PostgreSQL query string and credentials to return a df of the queried data.
+    psquery.rawdf is accessible to see the raw output of the query before the returned df is cleaned.
+
+
+    ::PARAMETERS::
+    q: String of query to run
+    host: PostgreSQL host
+    user: PostgreSQL username
+    pw: PostgreSQL password
+    db: PostgreSQL database to reference
+    """
+    engine = create_engine(f'postgresql://{user}:{pw}@{host}:{port}/{db}')
+    psquery.rawdf = pd.read_sql_query(q,engine)
+    df = psquery.rawdf.loc[:,~psquery.rawdf.columns.duplicated()] # ensure no duplicate columns
+    return df
 
 # FILE PARSING FUNCTIONS
 
